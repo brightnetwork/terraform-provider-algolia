@@ -6,7 +6,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 )
 
-func resourceSynonymCreate(d *schema.ResourceData, m interface{}) error {
+func resourceRegularSynonymCreate(d *schema.ResourceData, m interface{}) error {
 	client := *m.(*search.Client)
 	index := client.InitIndex(d.Get("index").(string))
 
@@ -18,10 +18,10 @@ func resourceSynonymCreate(d *schema.ResourceData, m interface{}) error {
 	}
 	res.Wait()
 	d.SetId(synonym.ObjectID())
-	return resourceSynonymRead(d, m)
+	return resourceRegularSynonymRead(d, m)
 }
 
-func resourceSynonymRead(d *schema.ResourceData, m interface{}) error {
+func resourceRegularSynonymRead(d *schema.ResourceData, m interface{}) error {
 	client := *m.(*search.Client)
 	index := client.InitIndex(d.Get("index").(string))
 
@@ -34,7 +34,7 @@ func resourceSynonymRead(d *schema.ResourceData, m interface{}) error {
 	return nil
 }
 
-func resourceSynonymUpdate(d *schema.ResourceData, m interface{}) error {
+func resourceRegularSynonymUpdate(d *schema.ResourceData, m interface{}) error {
 	client := *m.(*search.Client)
 	index := client.InitIndex(d.Get("index").(string))
 
@@ -44,10 +44,10 @@ func resourceSynonymUpdate(d *schema.ResourceData, m interface{}) error {
 		return err
 	}
 	res.Wait()
-	return resourceSynonymRead(d, m)
+	return resourceRegularSynonymRead(d, m)
 }
 
-func resourceSynonymDelete(d *schema.ResourceData, m interface{}) error {
+func resourceRegularSynonymDelete(d *schema.ResourceData, m interface{}) error {
 	client := *m.(*search.Client)
 	index := client.InitIndex(d.Get("index").(string))
 
@@ -60,12 +60,12 @@ func resourceSynonymDelete(d *schema.ResourceData, m interface{}) error {
 	return nil
 }
 
-func resourceSynonym() *schema.Resource {
+func resourceRegularSynonym() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceSynonymCreate,
-		Read:   resourceSynonymRead,
-		Update: resourceSynonymUpdate,
-		Delete: resourceSynonymDelete,
+		Create: resourceRegularSynonymCreate,
+		Read:   resourceRegularSynonymRead,
+		Update: resourceRegularSynonymUpdate,
+		Delete: resourceRegularSynonymDelete,
 
 		Schema: map[string]*schema.Schema{
 			"index": &schema.Schema{

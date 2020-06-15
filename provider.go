@@ -20,7 +20,7 @@ func Provider() *schema.Provider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"algolia_synonym": resourceSynonym(),
+			"algolia_regular_synonym": resourceRegularSynonym(),
 		},
 		ConfigureFunc: providerConfigure,
 	}
