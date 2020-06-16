@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/algolia/algoliasearch-client-go/v3/algolia/search"
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -66,6 +69,21 @@ func resourceRegularSynonym() *schema.Resource {
 		Read:   resourceRegularSynonymRead,
 		Update: resourceRegularSynonymUpdate,
 		Delete: resourceRegularSynonymDelete,
+		Importer: &schema.ResourceImporter{
+			State: func(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
+				// d.Id() here is the last argument passed to the `terraform import RESOURCE_TYPE.RESOURCE_NAME RESOURCE_ID` command
+				parts := strings.SplitN(d.Id(), ":", 2)
+
+				if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
+					return nil, fmt.Errorf("unexpected format of ID (%s), expected index:id", d.Id())
+				}
+
+				d.Set("index", parts[0])
+				d.SetId(parts[1])
+
+				return []*schema.ResourceData{d}, nil
+			},
+		},
 
 		Schema: map[string]*schema.Schema{
 			"index": &schema.Schema{
