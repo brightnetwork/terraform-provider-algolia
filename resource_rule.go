@@ -49,6 +49,12 @@ func flattenCondition(in search.RuleCondition) []interface{} {
 	return []interface{}{m}
 }
 
+func flattenConsequence(in search.RuleConsequence) string {
+	// Just using JSON for now
+	consequenceJSON, _ := json.Marshal(in)
+	return string(consequenceJSON)
+}
+
 func resourceRuleRead(d *schema.ResourceData, m interface{}) error {
 	client := *m.(*search.Client)
 	index := client.InitIndex(d.Get("index").(string))
@@ -58,11 +64,8 @@ func resourceRuleRead(d *schema.ResourceData, m interface{}) error {
 		return nil
 	}
 	d.Set("enabled", rule.Enabled.Get())
-
 	d.Set("condition", flattenCondition(rule.Condition))
-
-	consequenceJSON, _ := json.Marshal(rule.Consequence)
-	d.Set("consequence", string(consequenceJSON))
+	d.Set("consequence", flattenConsequence(rule.Consequence))
 
 	return nil
 }
