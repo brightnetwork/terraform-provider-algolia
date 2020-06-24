@@ -1,6 +1,6 @@
 # terraform-provider-algolia
 
-A custom terraform provider for managing our Algolia search indexes. Currently only supports synonyms (regular & one-way).
+A custom terraform provider for managing our Algolia search indexes. Currently only supports synonyms (regular & one-way) and query rules.
 
 The hope is that we'll open-source this when it's more mature and fully-featured.
 
@@ -22,6 +22,32 @@ resource "algolia_one_way_synonym" "accounting" {
   input    = "accounting"
   synonyms = ["Accounting, Tax & Audit"]
 }
+
+resource "algolia_rule" "test" {
+  index = "dan_test"
+
+  condition {
+    pattern   = "success story"
+    anchoring = "contains"
+  }
+
+  consequence = <<EOF
+{
+    "params": {
+        "query": {
+            "edits": [
+                {
+                    "type": "remove",
+                    "delete": "success story"
+                }
+            ]
+        },
+        "filters": "_objectModel:web.models.SuccessStory"
+    },
+    "filterPromotes": true
+}
+EOF
+}
 ```
 
 ## Import
@@ -31,6 +57,7 @@ Resources can be imported using the following commands:
 ```sh
 $ terraform import algolia_regular_synonym.foo index_name:syn-123456789-0
 $ terraform import algolia_one_way_synonym.bar index_name:syn-123456789-1
+$ terraform import algolia_rule.baz index_name:qr-123456789-0
 ```
 
 ## Local Development
