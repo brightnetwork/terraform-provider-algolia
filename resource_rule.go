@@ -22,6 +22,7 @@ func resourceRuleCreate(d *schema.ResourceData, m interface{}) error {
 	condition := search.RuleCondition{
 		Anchoring:    search.RulePatternAnchoring(conditionMap["anchoring"].(string)),
 		Pattern:      conditionMap["pattern"].(string),
+		Context:      conditionMap["context"].(string),
 		Alternatives: search.AlternativesEnabled(),
 	}
 	var consequence search.RuleConsequence
@@ -48,6 +49,7 @@ func flattenCondition(in search.RuleCondition) []interface{} {
 	m := make(map[string]interface{})
 	m["anchoring"] = in.Anchoring
 	m["pattern"] = in.Pattern
+	m["context"] = in.Context
 	return []interface{}{m}
 }
 
@@ -81,6 +83,7 @@ func resourceRuleUpdate(d *schema.ResourceData, m interface{}) error {
 	condition := search.RuleCondition{
 		Anchoring:    search.RulePatternAnchoring(conditionMap["anchoring"].(string)),
 		Pattern:      conditionMap["pattern"].(string),
+		Context:      conditionMap["context"].(string),
 		Alternatives: search.AlternativesEnabled(),
 	}
 	var consequence search.RuleConsequence
@@ -163,6 +166,10 @@ func resourceRule() *schema.Resource {
 						"anchoring": {
 							Type:     schema.TypeString,
 							Required: true,
+						},
+						"context": {
+							Type:     schema.TypeString,
+							Optional: true,
 						},
 					},
 				},
