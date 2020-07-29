@@ -19,11 +19,17 @@ func resourceRuleCreate(d *schema.ResourceData, m interface{}) error {
 
 	conditionsList := d.Get("condition").([]interface{})
 	conditionMap := conditionsList[0].(map[string]interface{})
+        var alternatives *search.Alternatives
+        if conditionMap["alternatives"].(bool) {
+            alternatives = search.AlternativesEnabled()
+        } else {
+            alternatives = search.AlternativesDisabled()
+        }
 	condition := search.RuleCondition{
 		Anchoring:    search.RulePatternAnchoring(conditionMap["anchoring"].(string)),
 		Pattern:      conditionMap["pattern"].(string),
 		Context:      conditionMap["context"].(string),
-		Alternatives: search.AlternativesEnabled(),
+		Alternatives: alternatives,
 	}
 	var consequence search.RuleConsequence
 	consequenceJSON := []byte(d.Get("consequence").(string))
@@ -50,6 +56,7 @@ func flattenCondition(in search.RuleCondition) []interface{} {
 	m["anchoring"] = in.Anchoring
 	m["pattern"] = in.Pattern
 	m["context"] = in.Context
+	m["alternatives"] = in.Alternatives
 	return []interface{}{m}
 }
 
@@ -80,11 +87,17 @@ func resourceRuleUpdate(d *schema.ResourceData, m interface{}) error {
 
 	conditionsList := d.Get("condition").([]interface{})
 	conditionMap := conditionsList[0].(map[string]interface{})
+        var alternatives *search.Alternatives
+        if conditionMap["alternatives"].(bool) {
+            alternatives = search.AlternativesEnabled()
+        } else {
+            alternatives = search.AlternativesDisabled()
+        }
 	condition := search.RuleCondition{
 		Anchoring:    search.RulePatternAnchoring(conditionMap["anchoring"].(string)),
 		Pattern:      conditionMap["pattern"].(string),
 		Context:      conditionMap["context"].(string),
-		Alternatives: search.AlternativesEnabled(),
+		Alternatives: alternatives,
 	}
 	var consequence search.RuleConsequence
 	consequenceJSON := []byte(d.Get("consequence").(string))
@@ -169,6 +182,10 @@ func resourceRule() *schema.Resource {
 						},
 						"context": {
 							Type:     schema.TypeString,
+							Optional: true,
+						},
+                                                "alternatives": {
+							Type:     schema.TypeBool,
 							Optional: true,
 						},
 					},
