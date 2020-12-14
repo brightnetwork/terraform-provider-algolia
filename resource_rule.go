@@ -19,12 +19,12 @@ func resourceRuleCreate(d *schema.ResourceData, m interface{}) error {
 
 	conditionsList := d.Get("condition").([]interface{})
 	conditionMap := conditionsList[0].(map[string]interface{})
-        var alternatives *search.Alternatives
-        if conditionMap["alternatives"].(bool) {
-            alternatives = search.AlternativesEnabled()
-        } else {
-            alternatives = search.AlternativesDisabled()
-        }
+	var alternatives *search.Alternatives
+	if conditionMap["alternatives"].(bool) {
+		alternatives = search.AlternativesEnabled()
+	} else {
+		alternatives = search.AlternativesDisabled()
+	}
 	condition := search.RuleCondition{
 		Anchoring:    search.RulePatternAnchoring(conditionMap["anchoring"].(string)),
 		Pattern:      conditionMap["pattern"].(string),
@@ -87,12 +87,12 @@ func resourceRuleUpdate(d *schema.ResourceData, m interface{}) error {
 
 	conditionsList := d.Get("condition").([]interface{})
 	conditionMap := conditionsList[0].(map[string]interface{})
-        var alternatives *search.Alternatives
-        if conditionMap["alternatives"].(bool) {
-            alternatives = search.AlternativesEnabled()
-        } else {
-            alternatives = search.AlternativesDisabled()
-        }
+	var alternatives *search.Alternatives
+	if conditionMap["alternatives"].(bool) {
+		alternatives = search.AlternativesEnabled()
+	} else {
+		alternatives = search.AlternativesDisabled()
+	}
 	condition := search.RuleCondition{
 		Anchoring:    search.RulePatternAnchoring(conditionMap["anchoring"].(string)),
 		Pattern:      conditionMap["pattern"].(string),
@@ -184,7 +184,7 @@ func resourceRule() *schema.Resource {
 							Type:     schema.TypeString,
 							Optional: true,
 						},
-                                                "alternatives": {
+						"alternatives": {
 							Type:     schema.TypeBool,
 							Optional: true,
 						},
