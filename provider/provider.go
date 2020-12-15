@@ -1,4 +1,4 @@
-package main
+package provider
 
 import (
 	"github.com/algolia/algoliasearch-client-go/v3/algolia/search"

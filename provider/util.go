@@ -1,4 +1,4 @@
-package main
+package provider
 
 // Helper function for casting []interface{} to []string
 func castStringList(inputItems []interface{}) []string {

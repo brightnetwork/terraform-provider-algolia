@@ -1,4 +1,4 @@
-package main
+package provider
 
 import (
 	"fmt"
@@ -9,22 +9,26 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
-func resourceRegularSynonymCreate(d *schema.ResourceData, m interface{}) error {
+func resourceOneWaySynonymCreate(d *schema.ResourceData, m interface{}) error {
 	client := *m.(*search.Client)
 	index := client.InitIndex(d.Get("index").(string))
 
-	id := uuid.New().String()
-	synonym := search.NewRegularSynonym(id, castStringList(d.Get("synonyms").([]interface{}))...)
+	synonym := search.NewOneWaySynonym(
+		uuid.New().String(),
+		d.Get("input").(string),
+		castStringList(d.Get("synonyms").([]interface{}))...,
+	)
+
 	res, err := index.SaveSynonym(synonym)
 	if err != nil {
 		return err
 	}
 	res.Wait()
 	d.SetId(synonym.ObjectID())
-	return resourceRegularSynonymRead(d, m)
+	return resourceOneWaySynonymRead(d, m)
 }
 
-func resourceRegularSynonymRead(d *schema.ResourceData, m interface{}) error {
+func resourceOneWaySynonymRead(d *schema.ResourceData, m interface{}) error {
 	client := *m.(*search.Client)
 	index := client.InitIndex(d.Get("index").(string))
 
@@ -33,24 +37,29 @@ func resourceRegularSynonymRead(d *schema.ResourceData, m interface{}) error {
 		d.SetId("")
 		return nil
 	}
-	d.Set("synonyms", synonym.(search.RegularSynonym).Synonyms)
+	d.Set("input", synonym.(search.OneWaySynonym).Input)
+	d.Set("synonyms", synonym.(search.OneWaySynonym).Synonyms)
 	return nil
 }
 
-func resourceRegularSynonymUpdate(d *schema.ResourceData, m interface{}) error {
+func resourceOneWaySynonymUpdate(d *schema.ResourceData, m interface{}) error {
 	client := *m.(*search.Client)
 	index := client.InitIndex(d.Get("index").(string))
 
-	synonym := search.NewRegularSynonym(d.Id(), castStringList(d.Get("synonyms").([]interface{}))...)
+	synonym := search.NewOneWaySynonym(
+		d.Id(),
+		d.Get("input").(string),
+		castStringList(d.Get("synonyms").([]interface{}))...,
+	)
 	res, err := index.SaveSynonym(synonym)
 	if err != nil {
 		return err
 	}
 	res.Wait()
-	return resourceRegularSynonymRead(d, m)
+	return resourceOneWaySynonymRead(d, m)
 }
 
-func resourceRegularSynonymDelete(d *schema.ResourceData, m interface{}) error {
+func resourceOneWaySynonymDelete(d *schema.ResourceData, m interface{}) error {
 	client := *m.(*search.Client)
 	index := client.InitIndex(d.Get("index").(string))
 
@@ -63,12 +72,12 @@ func resourceRegularSynonymDelete(d *schema.ResourceData, m interface{}) error {
 	return nil
 }
 
-func resourceRegularSynonym() *schema.Resource {
+func resourceOneWaySynonym() *schema.Resource {
 	return &schema.Resource{
-		Create: resourceRegularSynonymCreate,
-		Read:   resourceRegularSynonymRead,
-		Update: resourceRegularSynonymUpdate,
-		Delete: resourceRegularSynonymDelete,
+		Create: resourceOneWaySynonymCreate,
+		Read:   resourceOneWaySynonymRead,
+		Update: resourceOneWaySynonymUpdate,
+		Delete: resourceOneWaySynonymDelete,
 		Importer: &schema.ResourceImporter{
 			State: func(d *schema.ResourceData, meta interface{}) ([]*schema.ResourceData, error) {
 				// d.Id() here is the last argument passed to the `terraform import RESOURCE_TYPE.RESOURCE_NAME RESOURCE_ID` command
@@ -91,6 +100,11 @@ func resourceRegularSynonym() *schema.Resource {
 				Required:    true,
 				ForceNew:    true,
 				Description: "Algolia Index",
+			},
+			"input": &schema.Schema{
+				Type:        schema.TypeString,
+				Required:    true,
+				Description: "Search Term",
 			},
 			"synonyms": &schema.Schema{
 				Type:        schema.TypeList,
