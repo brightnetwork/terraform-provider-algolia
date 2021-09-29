@@ -86,13 +86,13 @@ func resourceRegularSynonym() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"index": &schema.Schema{
+			"index": {
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
 				Description: "Algolia Index",
 			},
-			"synonyms": &schema.Schema{
+			"synonyms": {
 				Type:        schema.TypeList,
 				Required:    true,
 				Description: "List of synonyms",

@@ -155,7 +155,7 @@ func resourceRule() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"index": &schema.Schema{
+			"index": {
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,

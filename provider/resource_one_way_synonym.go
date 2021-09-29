@@ -95,18 +95,18 @@ func resourceOneWaySynonym() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"index": &schema.Schema{
+			"index": {
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
 				Description: "Algolia Index",
 			},
-			"input": &schema.Schema{
+			"input": {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Search Term",
 			},
-			"synonyms": &schema.Schema{
+			"synonyms": {
 				Type:        schema.TypeList,
 				Required:    true,
 				Description: "List of synonyms",
