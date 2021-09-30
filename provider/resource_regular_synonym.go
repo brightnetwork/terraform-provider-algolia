@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/algolia/algoliasearch-client-go/v3/algolia/opt"
 	"github.com/algolia/algoliasearch-client-go/v3/algolia/search"
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -15,7 +16,7 @@ func resourceRegularSynonymCreate(d *schema.ResourceData, m interface{}) error {
 
 	id := uuid.New().String()
 	synonym := search.NewRegularSynonym(id, castStringList(d.Get("synonyms").([]interface{}))...)
-	res, err := index.SaveSynonym(synonym)
+	res, err := index.SaveSynonym(synonym, opt.ForwardToReplicas(d.Get("forward_to_replicas").(bool)))
 	if err != nil {
 		return err
 	}
@@ -42,7 +43,7 @@ func resourceRegularSynonymUpdate(d *schema.ResourceData, m interface{}) error {
 	index := client.InitIndex(d.Get("index").(string))
 
 	synonym := search.NewRegularSynonym(d.Id(), castStringList(d.Get("synonyms").([]interface{}))...)
-	res, err := index.SaveSynonym(synonym)
+	res, err := index.SaveSynonym(synonym, opt.ForwardToReplicas(d.Get("forward_to_replicas").(bool)))
 	if err != nil {
 		return err
 	}
@@ -55,7 +56,7 @@ func resourceRegularSynonymDelete(d *schema.ResourceData, m interface{}) error {
 	index := client.InitIndex(d.Get("index").(string))
 
 	id := d.Id()
-	res, err := index.DeleteSynonym(id)
+	res, err := index.DeleteSynonym(id, opt.ForwardToReplicas(d.Get("forward_to_replicas").(bool)))
 	if err != nil {
 		return err
 	}
@@ -86,13 +87,18 @@ func resourceRegularSynonym() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"index": &schema.Schema{
+			"index": {
 				Type:        schema.TypeString,
 				Required:    true,
 				ForceNew:    true,
 				Description: "Algolia Index",
 			},
-			"synonyms": &schema.Schema{
+			"forward_to_replicas": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  true,
+			},
+			"synonyms": {
 				Type:        schema.TypeList,
 				Required:    true,
 				Description: "List of synonyms",
