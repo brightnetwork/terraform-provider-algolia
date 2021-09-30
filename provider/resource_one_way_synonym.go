@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/algolia/algoliasearch-client-go/v3/algolia/opt"
 	"github.com/algolia/algoliasearch-client-go/v3/algolia/search"
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -19,7 +20,7 @@ func resourceOneWaySynonymCreate(d *schema.ResourceData, m interface{}) error {
 		castStringList(d.Get("synonyms").([]interface{}))...,
 	)
 
-	res, err := index.SaveSynonym(synonym)
+	res, err := index.SaveSynonym(synonym, opt.ForwardToReplicas(d.Get("forward_to_replicas").(bool)))
 	if err != nil {
 		return err
 	}
@@ -51,7 +52,7 @@ func resourceOneWaySynonymUpdate(d *schema.ResourceData, m interface{}) error {
 		d.Get("input").(string),
 		castStringList(d.Get("synonyms").([]interface{}))...,
 	)
-	res, err := index.SaveSynonym(synonym)
+	res, err := index.SaveSynonym(synonym, opt.ForwardToReplicas(d.Get("forward_to_replicas").(bool)))
 	if err != nil {
 		return err
 	}
@@ -64,7 +65,7 @@ func resourceOneWaySynonymDelete(d *schema.ResourceData, m interface{}) error {
 	index := client.InitIndex(d.Get("index").(string))
 
 	id := d.Id()
-	res, err := index.DeleteSynonym(id)
+	res, err := index.DeleteSynonym(id, opt.ForwardToReplicas(d.Get("forward_to_replicas").(bool)))
 	if err != nil {
 		return err
 	}
@@ -105,6 +106,11 @@ func resourceOneWaySynonym() *schema.Resource {
 				Type:        schema.TypeString,
 				Required:    true,
 				Description: "Search Term",
+			},
+			"forward_to_replicas": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  true,
 			},
 			"synonyms": {
 				Type:        schema.TypeList,

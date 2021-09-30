@@ -42,7 +42,7 @@ func resourceRuleCreate(d *schema.ResourceData, m interface{}) error {
 		Enabled:     opt.Enabled(d.Get("enabled").(bool)),
 	}
 
-	res, err := index.SaveRule(rule)
+	res, err := index.SaveRule(rule, opt.ForwardToReplicas(d.Get("forward_to_replicas").(bool)))
 	if err != nil {
 		return err
 	}
@@ -110,7 +110,7 @@ func resourceRuleUpdate(d *schema.ResourceData, m interface{}) error {
 		Enabled:     opt.Enabled(d.Get("enabled").(bool)),
 	}
 
-	res, err := index.SaveRule(rule)
+	res, err := index.SaveRule(rule, opt.ForwardToReplicas(d.Get("forward_to_replicas").(bool)))
 	if err != nil {
 		return err
 	}
@@ -124,7 +124,7 @@ func resourceRuleDelete(d *schema.ResourceData, m interface{}) error {
 	index := client.InitIndex(d.Get("index").(string))
 
 	id := d.Id()
-	res, err := index.DeleteRule(id)
+	res, err := index.DeleteRule(id, opt.ForwardToReplicas(d.Get("forward_to_replicas").(bool)))
 	if err != nil {
 		return err
 	}
@@ -162,6 +162,11 @@ func resourceRule() *schema.Resource {
 				Description: "Algolia Index",
 			},
 			"enabled": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Default:  true,
+			},
+			"forward_to_replicas": {
 				Type:     schema.TypeBool,
 				Optional: true,
 				Default:  true,
