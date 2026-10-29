@@ -6,3 +6,13 @@ updates:
       interval: "monthly"
     cooldown:
       default-days: 7
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    cooldown:
+      default-days: 7
+    groups:
+      go:
+        patterns:
+          - "*"
